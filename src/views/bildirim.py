@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from customtkinter import CTkToplevel, CTkFrame
 from src.views.widgets import Widgets
-from src.core.config import namazVaktiProConfig, configDegistir
+from src.core.config import configDegistir
+from src.api.namaz_api import NamazVaktiAPI
 import random
 
 class Bildirim(CTkToplevel,Widgets):
@@ -10,6 +11,7 @@ class Bildirim(CTkToplevel,Widgets):
         super().__init__(parent)
         
         self.kalanZaman = kalanZaman
+        self.namaz = NamazVaktiAPI()
         
         self.attributes("-fullscreen", True)
         self.attributes("-topmost", True)
@@ -109,31 +111,29 @@ class Bildirim(CTkToplevel,Widgets):
         ).grid(row=0,column=2,sticky="e",ipadx=10,ipady=10)
 
     def bildirimDialog(self,tus=False):
-        self.destroy()
         
-        self.dialog = CTkToplevel(self.master)
-        self.dialog.attributes("-topmost", True)
-        self.dialog.configure(fg_color="#29166B")
-        self.dialog.grid_rowconfigure((0,1), weight=1)
-        self.dialog.grid_columnconfigure(0, weight=1)
+        for widget in list(self.children.values()):
+            widget.destroy()
         
         if tus:
-            veri = random.choice(namazVaktiProConfig()["namazTrue"])
             configDegistir(bildirim=False)
-        else:
-            veri = random.choice(namazVaktiProConfig()["namazFalse"])
+            
+        veri = self.namaz.rastgeleAyet_Hadis().split()
+        if len(veri) > 10:
+            for i in range(0,len(veri),10):
+                veri.insert(i,"\n")
         
-        ayetNo = veri["ayetNo"]
-        ayet = veri["ayet"]
+        veri = " ".join(veri)
 
         self.labelGFX(
-            self.dialog,
-            f"{ayetNo}\n{ayet}",
+            self,
+            f"{veri}",
             text_color="#FFFFFF",
             font=("Segoe UI", 20, "bold")
-        ).grid(row=0, column=0, padx=20, pady=(20, 10), sticky="nsew")
-        
-        self.dialog.after(5000, self.dialog.destroy)
+        ).grid(row=1,column=0,columnspan=4,pady=10)
+
+        self.bind("<Button-1>", lambda event: self.destroy())
+        return
 
     def namazKil(self):
         self.bildirimDialog(True)

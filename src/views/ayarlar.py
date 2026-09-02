@@ -7,7 +7,8 @@ from tkinter import StringVar
 
 class Ayarlar(CTkFrame,Widgets,NamazVaktiAPI):
     def __init__(self, master):
-        super().__init__(master, fg_color="transparent")
+        CTkFrame.__init__(self, master, fg_color="transparent")
+        NamazVaktiAPI.__init__(self)
 
         self.columnconfigure([0,1,2], weight=1)
         
