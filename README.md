@@ -1,5 +1,9 @@
 # Namaz Vakti Pro (Beta)
 
+## İndirme Linki
+---
+[İndir](https://dosya.co/cyxhjm2l3gu8/Namaz_Vakti_Pro.exe.html)
+
 ## Özellikler
 
 - Src layout, Oop Yapısı
