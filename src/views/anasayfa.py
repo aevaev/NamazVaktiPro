@@ -91,24 +91,24 @@ class AnaSayfa(CTkFrame,Widgets):
             vakitSaat = self.labelGFX(vakitAdi, self.namazvakti[i], 2, font=2)
             vakitSaat.grid(row=index+1, column=2, sticky="e", padx=10, pady=5)
         
-        self.bildirim = self.frameGFX()
-        self.bildirim.grid(row=10,column=0,columnspan=2)
+        # self.bildirim = self.frameGFX()
+        # self.bildirim.grid(row=10,column=0,columnspan=2)
         
-        self.bildirimButon = CTkButton(
-            self.bildirim,
-            text="Test Bildirimi",
-            command=lambda:Bildirim(
-                self,
-                {
-                    "vakitSaat":self.namaz.mevcutVakit()["kalanSure"],
-                    "saat":self.zaman.saat(False),
-                    "vakit":self.namaz.mevcutVakit().get("vakit"),
-                    "sonrakiVakit":self.namazvakti[self.vakitAdi]
-                }
-            )
-        )
+        # self.bildirimButon = CTkButton(
+        #     self.bildirim,
+        #     text="Test Bildirimi",
+        #     command=lambda:Bildirim(
+        #         self,
+        #         {
+        #             "vakitSaat":self.namaz.mevcutVakit()["kalanSure"],
+        #             "saat":self.zaman.saat(False),
+        #             "vakit":self.namaz.mevcutVakit().get("vakit"),
+        #             "sonrakiVakit":self.namazvakti[self.vakitAdi]
+        #         }
+        #     )
+        # )
 
-        self.bildirimButon.grid(row=0,column=0)
+        # self.bildirimButon.grid(row=0,column=0)
         
     def saatiGuncelle(self,text):
         self.saatGoster.configure(text=text)
@@ -147,7 +147,6 @@ class AnaSayfa(CTkFrame,Widgets):
                     configDegistir(bildirim=True)
                 else:
                     return
-
             # if self.namaz.mevcutVakit().get("vakit") == "Sabah" and self.kalanSure != "0:00:01":return
             
             if "2:" in self.kalanSure:
