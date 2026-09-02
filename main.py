@@ -12,11 +12,9 @@ def otomatk_baslat_ayarla():
     try:
         import winreg
 
-        py = sys.executable
-        pythonw = os.path.join(os.path.dirname(py), "pythonw.exe")
-        start = pythonw if os.path.exists(pythonw) else py
-
-        kod = f'"{start}" "{sys.executable}"'
+        exe = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "NamazVaktiPro.exe")
+            )
 
         with winreg.OpenKey(
             winreg.HKEY_CURRENT_USER,
@@ -24,11 +22,17 @@ def otomatk_baslat_ayarla():
             0,
             winreg.KEY_SET_VALUE,
         ) as key:
-            winreg.SetValueEx(key, "NamazVaktiPro", 0, winreg.REG_SZ, kod)
-    except Exception:
-        pass
+            winreg.SetValueEx(
+                key,
+                "NamazVaktiPro",
+                0,
+                winreg.REG_SZ,
+                f'"{exe}"',
+            )
 
-
+    except Exception as e:
+        print(e)
+        
 if __name__ == "__main__":
     otomatk_baslat_ayarla()
     app = App()
