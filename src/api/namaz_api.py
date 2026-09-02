@@ -1,25 +1,37 @@
-from curl_cffi import requests
+import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from threading import Thread
 import time,os
 from src.core.config import namazVaktiProConfig
+from fake_useragent import UserAgent
 
 class NamazVaktiAPI:
     def __init__(self):
         self.vakitler = {}
-
+        
+        self._istek = requests.Session()
+        self._istek.headers = {
+            "User-Agent": UserAgent().random,
+            "Connection": "keep-alive",
+            "accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "accept-encoding":"gzip, deflate, br, zstd"
+        }
+        
     sehirUrl = "https://namazvakitleri.diyanet.gov.tr/tr-TR/home/GetRegList?ChangeType=country&CountryId=2&Culture=tr-TR"
     ilceUrl = "https://namazvakitleri.diyanet.gov.tr/tr-TR/home/GetRegList?ChangeType=state&CountryId=2&Culture=tr-TR&StateId="
     baseUrl = "https://namazvakitleri.diyanet.gov.tr"
+    rastgeleAyetHadisUrl = "https://www.diyanethaber.com.tr/istanbul-namaz-vakitleri"
     
     def mevcutVakit(self):
         if not self.vakitler:
             return "Şehir Ayarlanmadı"
         
         su_an = datetime.now().strftime("%H:%M:%S")
-
-        sonraki_imsak = self.bsDiyanet.find("td",attrs={"itemprop":"description"}).text
+        
+        sonraki_imsak = self.bsDiyanet.find("table",attrs={"class":"vakit-table"}).find_all("tr")[2].find_all("td")[2].text.strip()
+        
+        print(sonraki_imsak)
         
         def strp(vakit):
             if len(vakit.split(":")) == 2: vakit += ":00"
@@ -73,7 +85,7 @@ class NamazVaktiAPI:
     
     def getirSehir(self):
         self.sehirList = []
-        r = requests.get(self.sehirUrl).json()["StateList"]
+        r = self._istek.get(self.sehirUrl, timeout=10).json()["StateList"]
 
         for i in r:
             self.sehirList.append({
@@ -95,7 +107,7 @@ class NamazVaktiAPI:
         
         self.ilceList = []
 
-        r = requests.get(self.ilceUrl + str(self.sehirNo)).json()["StateRegionList"]
+        r = self._istek.get(self.ilceUrl + str(self.sehirNo),timeout=10).json()["StateRegionList"]
         
         for i in r:
             self.ilceList.append({
@@ -116,7 +128,7 @@ class NamazVaktiAPI:
                 self.ilceUrlAdi = i["url"]
                 break
         
-        r = requests.get(self.baseUrl + self.ilceUrlAdi).text
+        r = self._istek.get(self.baseUrl + self.ilceUrlAdi,timeout=10).text
         
         self.bsDiyanet = BeautifulSoup(r, "html.parser")
 
@@ -137,3 +149,11 @@ class NamazVaktiAPI:
         self.vakitler = vakitJson
 
         return vakitJson
+    
+    def rastgeleAyet_Hadis(self):
+        r = requests.get(self.rastgeleAyetHadisUrl,timeout=10).text
+        
+        b = BeautifulSoup(r, "html.parser")
+        veri = b.find("div", {"class": "hadith"}).text.strip()
+        
+        return veri
